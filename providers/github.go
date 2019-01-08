@@ -89,6 +89,7 @@ func (p *GitHubProvider) hasOrg(accessToken string) (bool, error) {
 
 		body, err := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
+                log.Printf("Response to /user/orgs: %s", body)
 		if err != nil {
 			return false, err
 		}
@@ -153,7 +154,8 @@ func (p *GitHubProvider) hasOrgAndTeam(accessToken string) (bool, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-	if err != nil {
+        log.Printf("Response to /user/teams: %s", body)
+        if err != nil {
 		return false, err
 	}
 	if resp.StatusCode != 200 {
