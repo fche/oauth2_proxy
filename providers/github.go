@@ -89,7 +89,7 @@ func (p *GitHubProvider) hasOrg(accessToken string) (bool, error) {
 
 		body, err := ioutil.ReadAll(resp.Body)
 		resp.Body.Close()
-                log.Printf("Response to /user/orgs: %s", body)
+                log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
 		if err != nil {
 			return false, err
 		}
@@ -154,7 +154,7 @@ func (p *GitHubProvider) hasOrgAndTeam(accessToken string) (bool, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
-        log.Printf("Response to /user/teams: %s", body)
+        log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
         if err != nil {
 		return false, err
 	}
@@ -197,7 +197,8 @@ func (p *GitHubProvider) hasOrgAndTeam(accessToken string) (bool, error) {
 }
 
 func (p *GitHubProvider) GetEmailAddress(s *SessionState) (string, error) {
-
+        log.Printf("getemailaddress %s", s)
+        
 	var emails []struct {
 		Email   string `json:"email"`
 		Primary bool   `json:"primary"`
@@ -229,6 +230,7 @@ func (p *GitHubProvider) GetEmailAddress(s *SessionState) (string, error) {
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+        log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
 	if err != nil {
 		return "", err
 	}
@@ -237,9 +239,6 @@ func (p *GitHubProvider) GetEmailAddress(s *SessionState) (string, error) {
 		return "", fmt.Errorf("got %d from %q %s",
 			resp.StatusCode, endpoint.String(), body)
 	}
-
-	log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
-
 	if err := json.Unmarshal(body, &emails); err != nil {
 		return "", fmt.Errorf("%s unmarshaling %s", err, body)
 	}
@@ -254,7 +253,9 @@ func (p *GitHubProvider) GetEmailAddress(s *SessionState) (string, error) {
 }
 
 func (p *GitHubProvider) GetUserName(s *SessionState) (string, error) {
-	var user struct {
+        log.Printf("getusername %s", s)
+
+        var user struct {
 		Login string `json:"login"`
 		Email string `json:"email"`
 	}
@@ -278,6 +279,7 @@ func (p *GitHubProvider) GetUserName(s *SessionState) (string, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
+	log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
 	if err != nil {
 		return "", err
 	}
@@ -286,8 +288,6 @@ func (p *GitHubProvider) GetUserName(s *SessionState) (string, error) {
 		return "", fmt.Errorf("got %d from %q %s",
 			resp.StatusCode, endpoint.String(), body)
 	}
-
-	log.Printf("got %d from %q %s", resp.StatusCode, endpoint.String(), body)
 
 	if err := json.Unmarshal(body, &user); err != nil {
 		return "", fmt.Errorf("%s unmarshaling %s", err, body)
